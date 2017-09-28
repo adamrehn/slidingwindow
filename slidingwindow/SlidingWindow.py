@@ -13,12 +13,17 @@ class SlidingWindow(object):
 	Represents a single window into a larger dataset.
 	"""
 	
-	def __init__(self, x, y, w, h, dimOrder):
+	def __init__(self, x, y, w, h, dimOrder, transform = None):
 		self.x = x
 		self.y = y
 		self.w = w
 		self.h = h
 		self.dimOrder = dimOrder
+		self.transform = transform
+	
+	def apply(self, matrix):
+		view = matrix[ self.indices() ]
+		return self.transform(view) if self.transform != None else view
 	
 	def indices(self, includeChannel=True):
 		if self.dimOrder == DimOrder.HeightWidthChannel:
@@ -58,7 +63,7 @@ class SlidingWindow(object):
 		return self.__str__()
 
 
-def generate(data, dimOrder, maxWindowSize, overlapPercent):
+def generate(data, dimOrder, maxWindowSize, overlapPercent, transforms = []):
 	"""
 	Generates a set of sliding windows for the specified dataset.
 	"""
@@ -95,12 +100,14 @@ def generate(data, dimOrder, maxWindowSize, overlapPercent):
 	windows = []
 	for xOffset in xOffsets:
 		for yOffset in yOffsets:
-			windows.append(SlidingWindow(
-				x=xOffset,
-				y=yOffset,
-				w=windowSizeX,
-				h=windowSizeY,
-				dimOrder=dimOrder
-			))
+			for transform in [None] + transforms:
+				windows.append(SlidingWindow(
+					x=xOffset,
+					y=yOffset,
+					w=windowSizeX,
+					h=windowSizeY,
+					dimOrder=dimOrder,
+					transform=transform
+				))
 	
 	return windows

@@ -9,7 +9,7 @@ setup(
 	author_email = 'adam@adamrehn.com',
 	license = 'MIT',
 	packages = ['slidingwindow'],
-	zip_safe = False,
+	zip_safe = True,
 	install_requires = [
 		'numpy'
 	]
