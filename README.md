@@ -12,7 +12,7 @@ Installation
 To install, run:
 
 ```
-pip install .
+pip install slidingwindow
 ```
 
 
