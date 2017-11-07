@@ -5,6 +5,8 @@ This is a simple little Python library for computing a set of windows into a lar
 
 Functionality is also included to compute a distance matrix for a window, for use cases where the position of each pixel in a window (relative to its centre) needs to be taken into account.
 
+For use cases where window bounds need to be modified after they have been generated, window objects can be converted to and from rectangles represented by a tuple of (x,y,w,h). Functionality for transforming rectangles (padding, cropping, forcing a square aspect ratio, etc.) are also provided.
+
 
 Installation
 ------------
@@ -44,6 +46,14 @@ tranforms = [
 windows = sw.generate(data, sw.DimOrder.HeightWidthChannel, 256, 0.5, tranforms)
 for window in windows:
 	transformed = window.apply(data)
+	# ...
+
+# Alternatively, if we want to modify each window
+windows = sw.generate(data, sw.DimOrder.HeightWidthChannel, 256, 0.5)
+for window in windows:
+	rect = window.getRect()
+	transformed = sw.padRectEqually(rect, 100, data.shape)
+	window.setRect(transformed)
 	# ...
 
 ```

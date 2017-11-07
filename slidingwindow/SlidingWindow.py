@@ -14,6 +14,9 @@ class SlidingWindow(object):
 	"""
 	
 	def __init__(self, x, y, w, h, dimOrder, transform = None):
+		"""
+		Creates a new window with the specified dimensions and transform
+		"""
 		self.x = x
 		self.y = y
 		self.w = w
@@ -22,10 +25,28 @@ class SlidingWindow(object):
 		self.transform = transform
 	
 	def apply(self, matrix):
+		"""
+		Slices the supplied matrix and applies any transform bound to this window
+		"""
 		view = matrix[ self.indices() ]
 		return self.transform(view) if self.transform != None else view
 	
+	def getRect(self):
+		"""
+		Returns the window bounds as a tuple of (x,y,w,h)
+		"""
+		return (self.x, self.y, self.w, self.h)
+	
+	def setRect(self, rect):
+		"""
+		Sets the window bounds from a tuple of (x,y,w,h)
+		"""
+		self.x, self.y, self.w, self.h = rect
+	
 	def indices(self, includeChannel=True):
+		"""
+		Retrieves the indices for this window as a tuple of slices
+		"""
 		if self.dimOrder == DimOrder.HeightWidthChannel:
 			
 			# Equivalent to [self.y:self.y+self.h+1, self.x:self.x+self.w+1]
