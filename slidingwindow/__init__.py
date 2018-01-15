@@ -1,4 +1,4 @@
-from .SlidingWindow import DimOrder, SlidingWindow, generate
+from .SlidingWindow import DimOrder, SlidingWindow, generate, generateForSize
 from .WindowDistance import generateDistanceMatrix
 from .RectangleUtils import *
 from .ArrayUtils import *
