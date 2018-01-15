@@ -93,6 +93,15 @@ def generate(data, dimOrder, maxWindowSize, overlapPercent, transforms = []):
 	width = data.shape[dimOrder.index('w')]
 	height = data.shape[dimOrder.index('h')]
 	
+	# Generate the windows
+	return generate(width, height, dimOrder, maxWindowSize, overlapPercent, transforms)
+
+
+def generate(width, height, dimOrder, maxWindowSize, overlapPercent, transforms = []):
+	"""
+	Generates a set of sliding windows for a dataset with the specified dimensions and order.
+	"""
+	
 	# If the input data is smaller than the specified window size,
 	# clip the window size to the input size on both dimensions
 	windowSizeX = min(maxWindowSize, width)

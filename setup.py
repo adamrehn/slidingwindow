@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
 	name = 'slidingwindow',
-	version = '0.0.5',
+	version = '0.0.6',
 	description = 'Sliding Window library for image processing in Python',
 	url = 'https://github.com/adamrehn/slidingwindow',
 	author = 'Adam Rehn',
