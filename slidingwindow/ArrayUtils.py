@@ -50,3 +50,17 @@ def zerosFactory(shape, dtype=float):
 	arr = arrayFactory(shape=shape, dtype=dtype)
 	arr.fill(0)
 	return arr
+
+
+def arrayCast(source, dtype):
+	"""
+	Casts a NumPy array to the specified datatype, storing the copy
+	in memory if there is sufficient available space or else using a
+	memory-mapped temporary file to provide the underlying buffer.
+	"""
+	try:
+		return source.astype(dtype, subok=False)
+	except MemoryError:
+		dest = arrayFactory(source.shape, dtype)
+		np.copyto(dest, source, casting='unsafe')
+		return dest
