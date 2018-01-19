@@ -7,7 +7,7 @@ def _requiredSize(shape, dtype):
 	Determines the number of bytes required to store a NumPy array with
 	the specified shape and datatype.
 	"""
-	return np.prod(np.asarray(shape, dtype=np.uint64)) * np.dtype(dtype).itemsize
+	return math.floor(np.prod(np.asarray(shape, dtype=np.uint64)) * np.dtype(dtype).itemsize)
 
 
 class TempfileBackedArray(np.ndarray):
