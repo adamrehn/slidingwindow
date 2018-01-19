@@ -1,5 +1,14 @@
 import mmap, tempfile
 import numpy as np
+import psutil
+
+def _requiredSize(shape, dtype):
+	"""
+	Determines the number of bytes required to store a NumPy array with
+	the specified shape and datatype.
+	"""
+	return np.prod(np.asarray(shape, dtype=np.uint64)) * np.dtype(dtype).itemsize
+
 
 class TempfileBackedArray(np.ndarray):
 	"""
@@ -20,7 +29,7 @@ class TempfileBackedArray(np.ndarray):
 		buf = mmap.mmap(tempFile.fileno(), numBytes, access=mmap.ACCESS_WRITE)
 		
 		# Create the ndarray with the memory map as the underlying buffer
-		obj = super(TempfileBackedArray, subtype).__new__(subtype, shape, dtype, buffer, offset, strides, order)
+		obj = super(TempfileBackedArray, subtype).__new__(subtype, shape, dtype, buf, 0, None, order)
 		
 		# Attach the file reference to the ndarray object
 		obj._file = tempFile
@@ -37,9 +46,15 @@ def arrayFactory(shape, dtype=float):
 	it in memory if there is sufficient available space or else using
 	a memory-mapped temporary file to provide the underlying buffer.
 	"""
-	try:
+	
+	# Determine the number of bytes required to store the array
+	requiredBytes = _requiredSize(shape, dtype)
+	
+	# Determine if there is sufficient available memory
+	vmem = psutil.virtual_memory()
+	if vmem.available > requiredBytes:
 		return np.ndarray(shape=shape, dtype=dtype)
-	except MemoryError:
+	else:
 		return TempfileBackedArray(shape=shape, dtype=dtype)
 
 
@@ -58,12 +73,19 @@ def arrayCast(source, dtype):
 	in memory if there is sufficient available space or else using a
 	memory-mapped temporary file to provide the underlying buffer.
 	"""
-	try:
+	
+	# Determine the number of bytes required to store the array
+	requiredBytes = _requiredSize(source.shape, dtype)
+	
+	# Determine if there is sufficient available memory
+	vmem = psutil.virtual_memory()
+	if vmem.available > requiredBytes:
 		return source.astype(dtype, subok=False)
-	except MemoryError:
+	else:
 		dest = arrayFactory(source.shape, dtype)
 		np.copyto(dest, source, casting='unsafe')
 		return dest
+
 
 def determineMaxWindowSize(maxAllowed, dtype):
 	"""
@@ -71,12 +93,10 @@ def determineMaxWindowSize(maxAllowed, dtype):
 	specified maximum), based on the specified datatype and amount of
 	currently available system memory.
 	"""
+	vmem = psutil.virtual_memory()
+	
 	windowSize = maxAllowed
-	while True:
-		try:
-			testArray = np.ones((windowSize, windowSize), dtype=dtype)
-			break
-		except MemoryError:
-			windowSize = windowSize // 2
+	while vmem.available < _requiredSize((windowSize, windowSize), dtype):
+		windowSize = windowSize // 2
 	
 	return windowSize

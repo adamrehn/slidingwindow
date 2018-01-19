@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
 	name = 'slidingwindow',
-	version = '0.0.10',
+	version = '0.0.11',
 	description = 'Sliding Window library for image processing in Python',
 	url = 'https://github.com/adamrehn/slidingwindow',
 	author = 'Adam Rehn',
@@ -11,6 +11,7 @@ setup(
 	packages = ['slidingwindow'],
 	zip_safe = True,
 	install_requires = [
-		'numpy'
+		'numpy',
+		'psutil'
 	]
 )
