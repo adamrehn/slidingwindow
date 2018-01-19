@@ -7,7 +7,7 @@ Functionality is also included to compute a distance matrix for a window, for us
 
 For use cases where window bounds need to be modified after they have been generated, window objects can be converted to and from rectangles represented by a tuple of (x,y,w,h). Functionality for transforming rectangles (padding, cropping, forcing a square aspect ratio, etc.) are also provided.
 
-Functionality is also provided for NumPy array creation that will fallback to using memory-mapped temporary files for the underling array buffers if there is insufficient system memory available.
+Functionality is also provided for NumPy array creation that will fallback to using memory-mapped temporary files for the underling array buffers if there is insufficient system memory available, as well as determining the largest square window size that can be used when generating windows.
 
 
 Installation

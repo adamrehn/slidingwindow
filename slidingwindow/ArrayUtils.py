@@ -64,3 +64,19 @@ def arrayCast(source, dtype):
 		dest = arrayFactory(source.shape, dtype)
 		np.copyto(dest, source, casting='unsafe')
 		return dest
+
+def determineMaxWindowSize(maxAllowed, dtype):
+	"""
+	Determines the largest square window size that can be used (up to the
+	specified maximum), based on the specified datatype and amount of
+	currently available system memory.
+	"""
+	windowSize = maxAllowed
+	while True:
+		try:
+			testArray = np.ones((windowSize, windowSize), dtype=dtype)
+			break
+		except MemoryError:
+			windowSize = windowSize // 2
+	
+	return windowSize
