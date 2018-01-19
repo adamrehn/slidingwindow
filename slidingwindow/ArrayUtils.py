@@ -1,4 +1,4 @@
-import mmap, tempfile
+import math, mmap, tempfile
 import numpy as np
 import psutil
 
@@ -18,10 +18,7 @@ class TempfileBackedArray(np.ndarray):
 	def __new__(subtype, shape, dtype=float, buffer=None, offset=0, strides=None, order=None, info=None):
 		
 		# Determine the size in bytes required to hold the array
-		size = 1
-		for k in shape:
-			size *= k
-		numBytes = size * np.dtype(dtype).itemsize
+		numBytes = _requiredSize(shape, dtype)
 		
 		# Create the temporary file, resize it, and map it into memory
 		tempFile = tempfile.TemporaryFile()
@@ -87,16 +84,17 @@ def arrayCast(source, dtype):
 		return dest
 
 
-def determineMaxWindowSize(maxAllowed, dtype):
+def determineMaxWindowSize(dtype, limit=None):
 	"""
-	Determines the largest square window size that can be used (up to the
-	specified maximum), based on the specified datatype and amount of
-	currently available system memory.
+	Determines the largest square window size that can be used, based on
+	the specified datatype and amount of currently available system memory.
+	
+	If `limit` is specified, then this value will be returned in the event
+	that it is smaller than the maximum computed size.
 	"""
 	vmem = psutil.virtual_memory()
-	
-	windowSize = maxAllowed
-	while vmem.available < _requiredSize((windowSize, windowSize), dtype):
-		windowSize = windowSize // 2
-	
-	return windowSize
+	maxSize = math.floor(math.sqrt(vmem.available / np.dtype(dtype).itemsize))
+	if limit is None or limit >= maxSize:
+		return maxSize
+	else:
+		return limit
