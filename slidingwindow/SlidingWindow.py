@@ -84,48 +84,48 @@ class SlidingWindow(object):
 		return self.__str__()
 
 
-def generate(data, dimOrder, maxWindowSize, overlapPercent, transforms = []):
+def generate(data, dimOrder, maxWindowSize, overlapPercent, transforms=[]):
 	"""
 	Generates a set of sliding windows for the specified dataset.
 	"""
-	
+
 	# Determine the dimensions of the input data
 	width = data.shape[dimOrder.index('w')]
 	height = data.shape[dimOrder.index('h')]
-	
+
 	# Generate the windows
 	return generateForSize(width, height, dimOrder, maxWindowSize, overlapPercent, transforms)
 
 
-def generateForSize(width, height, dimOrder, maxWindowSize, overlapPercent, transforms = []):
+def generateForSize(width, height, dimOrder, maxWindowSize, overlapPercent, transforms=[]):
 	"""
 	Generates a set of sliding windows for a dataset with the specified dimensions and order.
 	"""
-	
+
 	# If the input data is smaller than the specified window size,
 	# clip the window size to the input size on both dimensions
 	windowSizeX = min(maxWindowSize, width)
 	windowSizeY = min(maxWindowSize, height)
-	
+
 	# Compute the window overlap and step size
 	windowOverlapX = int(math.floor(windowSizeX * overlapPercent))
 	windowOverlapY = int(math.floor(windowSizeY * overlapPercent))
 	stepSizeX = windowSizeX - windowOverlapX
 	stepSizeY = windowSizeY - windowOverlapY
-	
+
 	# Determine how many windows we will need in order to cover the input data
 	lastX = width - windowSizeX
 	lastY = height - windowSizeY
-	xOffsets = list(range(0, lastX+1, stepSizeX))
-	yOffsets = list(range(0, lastY+1, stepSizeY))
-	
+	xOffsets = list(range(0, lastX + 1, stepSizeX))
+	yOffsets = list(range(0, lastY + 1, stepSizeY))
+
 	# Unless the input data dimensions are exact multiples of the step size,
 	# we will need one additional row and column of windows to get 100% coverage
 	if len(xOffsets) == 0 or xOffsets[-1] != lastX:
 		xOffsets.append(lastX)
 	if len(yOffsets) == 0 or yOffsets[-1] != lastY:
 		yOffsets.append(lastY)
-	
+
 	# Generate the list of windows
 	windows = []
 	for xOffset in xOffsets:
@@ -139,5 +139,87 @@ def generateForSize(width, height, dimOrder, maxWindowSize, overlapPercent, tran
 					dimOrder=dimOrder,
 					transform=transform
 				))
-	
+
+	return windows
+
+
+def generateForRectWindows(data, dimOrder, windowShape, overlapPercent, transforms=[]):
+	"""
+    Generates a set of sliding windows for the specified dataset.
+    WindowMode has to be one of 'sqaure', 'rectangle' or 'distribute'.
+    """
+	# Determine the dimensions of the input data
+	imgHeight = data.shape[dimOrder.index('h')]
+	imgWidth = data.shape[dimOrder.index('w')]
+	imgShape = imgHeight, imgWidth
+
+	if not isinstance(windowShape, tuple) or len(windowShape) != 2:
+		raise Exception(
+			"'windowShape' has to be a tuple with height and width of sliding window in 'rectangle' mode.")
+
+	# Generate the windows
+	return generateForWindowSize(windowShape, imgShape, dimOrder, overlapPercent, transforms)
+
+def generateForNumberOfWindows(data, dimOrder, windowShape, overlapPercent, transforms=[]):
+	"""
+    Generates a set of sliding windows for the specified dataset.
+    WindowMode has to be one of 'sqaure', 'rectangle' or 'distribute'.
+    """
+	# Determine the dimensions of the input data
+	imgHeight = data.shape[dimOrder.index('h')]
+	imgWidth = data.shape[dimOrder.index('w')]
+	imgShape = imgHeight, imgWidth
+
+	numWindowY, numWindowX = windowShape
+
+	windowSizeY = math.ceil(imgHeight / numWindowY)
+	windowSizeX = math.ceil(imgWidth / numWindowX)
+
+	windowShape = windowSizeY, windowSizeX
+
+	# Generate the windows
+	return generateForWindowSize(windowShape, imgShape, dimOrder, overlapPercent, transforms)
+
+
+def generateForWindowSize(windowShape, imgShape, dimOrder, overlapPercent, transforms=[]):
+	"""
+	Generates a set of sliding windows for a dataset with the specified dimensions and order.
+    """
+
+	windowSizeY, windowSizeX = windowShape
+
+	# Compute the window overlap and step size
+	windowOverlapX = int(math.floor(windowSizeX * overlapPercent))
+	windowOverlapY = int(math.floor(windowSizeY * overlapPercent))
+	stepSizeX = windowSizeX - windowOverlapX
+	stepSizeY = windowSizeY - windowOverlapY
+
+	# Determine how many windows we will need in order to cover the input data
+	imgHeight, imgWidth = imgShape
+	lastX = imgWidth - windowSizeX
+	lastY = imgHeight - windowSizeY
+	xOffsets = list(range(0, lastX + 1, stepSizeX))
+	yOffsets = list(range(0, lastY + 1, stepSizeY))
+
+	# Unless the input data dimensions are exact multiples of the step size,
+	# we will need one additional row and column of windows to get 100% coverage
+	if len(xOffsets) == 0 or xOffsets[-1] != lastX:
+		xOffsets.append(lastX)
+	if len(yOffsets) == 0 or yOffsets[-1] != lastY:
+		yOffsets.append(lastY)
+
+	# Generate the list of windows
+	windows = []
+	for xOffset in xOffsets:
+		for yOffset in yOffsets:
+			for transform in [None] + transforms:
+				windows.append(SlidingWindow(
+					x=xOffset,
+					y=yOffset,
+					w=windowSizeX,
+					h=windowSizeY,
+					dimOrder=dimOrder,
+					transform=transform
+				))
+
 	return windows
