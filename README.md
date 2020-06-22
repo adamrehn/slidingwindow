@@ -1,3 +1,5 @@
+[![Version](https://img.shields.io/pypi/v/slidingwindow.svg)](https://pypi.python.org/pypi/slidingwindow)
+
 Sliding Window
 ==============
 
@@ -23,7 +25,7 @@ pip install slidingwindow
 Usage Example
 -------------
 
-```
+```Python
 import slidingwindow as sw
 import numpy as np
 
