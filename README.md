@@ -15,10 +15,16 @@ Functionality is also provided for NumPy array creation that will fallback to us
 Installation
 ------------
 
-To install, run:
+To install with pip, run:
 
 ```
 pip install slidingwindow
+```
+
+To install with conda, run:
+
+```
+conda install slidingwindow
 ```
 
 
