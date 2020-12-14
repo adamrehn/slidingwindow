@@ -1,4 +1,6 @@
 [![Version](https://img.shields.io/pypi/v/slidingwindow.svg)](https://pypi.python.org/pypi/slidingwindow) ![Build Status](https://img.shields.io/travis/com/adamrehn/slidingwindow)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/slidingwindow/badges/downloads.svg)](https://anaconda.org/conda-forge/slidingwindow)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/slidingwindow/badges/version.svg)](https://anaconda.org/conda-forge/slidingwindow)
 
 Sliding Window
 ==============
@@ -15,10 +17,16 @@ Functionality is also provided for NumPy array creation that will fallback to us
 Installation
 ------------
 
-To install, run:
+To install with pip, run:
 
 ```
 pip install slidingwindow
+```
+
+To install with conda, run:
+
+```
+conda install slidingwindow
 ```
 
 
